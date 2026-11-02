@@ -1,0 +1,6 @@
+{
+  "name": "Quản lý lớp học thông minh - Thời khóa biểu",
+  "description": "Hệ thống quản lý thời khóa biểu thông minh cho lớp học, giáo viên và phòng học với chế độ chỉnh sửa trực tiếp và xóa nhanh.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

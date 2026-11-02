@@ -1,0 +1,158 @@
+{
+  "entities": {
+    "Timetable": {
+      "title": "Timetable",
+      "description": "Smart classroom timetable schedule for class, teacher or room",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "targetId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "type": {
+          "type": "string",
+          "enum": ["class", "teacher", "room"]
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "activeDays": {
+          "type": "array"
+        },
+        "periods": {
+          "type": "array"
+        },
+        "grid": {
+          "type": "object"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "authorId": {
+          "type": "string",
+          "maxLength": 128
+        }
+      },
+      "required": ["id", "targetId", "type", "title", "activeDays", "periods", "grid"]
+    },
+    "Question": {
+      "title": "Question",
+      "description": "Question bank item",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "code": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "subject": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "grade": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "topic": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "level": {
+          "type": "string",
+          "enum": ["nhan_biet", "thong_hieu", "van_dung", "van_dung_cao"]
+        },
+        "type": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "typeLabel": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "points": {
+          "type": "number"
+        },
+        "content": {
+          "type": "string",
+          "maxLength": 5000
+        },
+        "options": {
+          "type": "array"
+        },
+        "explanation": {
+          "type": "string",
+          "maxLength": 5000
+        },
+        "authorId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "maxLength": 50
+        }
+      },
+      "required": ["id", "code", "subject", "grade", "topic", "level", "content"]
+    },
+    "User": {
+      "title": "User",
+      "description": "User profile for teachers and administrators",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 200
+        },
+        "photoURL": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "role": {
+          "type": "string",
+          "enum": ["teacher", "admin"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "email"]
+    }
+  },
+  "firestore": {
+    "/timetables/{scheduleId}": {
+      "schema": "Timetable",
+      "description": "Collection of all timetable schedules"
+    },
+    "/questions/{questionId}": {
+      "schema": "Question",
+      "description": "Collection of questions in the question bank"
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User account profiles"
+    }
+  }
+}

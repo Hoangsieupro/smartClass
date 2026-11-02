@@ -1,0 +1,85 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: Default-deny all undefined paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation for Timetable entities
+    function isValidTimetable(data) {
+      return data.keys().hasAll(['id', 'targetId', 'type', 'title', 'activeDays', 'periods', 'grid']) &&
+        data.id is string && data.id.size() <= 128 &&
+        data.targetId is string && data.targetId.size() <= 128 &&
+        data.type in ['class', 'teacher', 'room'] &&
+        data.title is string && data.title.size() <= 200 &&
+        data.activeDays is list && data.activeDays.size() <= 7 &&
+        data.periods is list && data.periods.size() <= 30 &&
+        data.grid is map;
+    }
+
+    // Validation for Question entities
+    function isValidQuestion(data) {
+      return data.keys().hasAll(['id', 'code', 'subject', 'grade', 'topic', 'level', 'content']) &&
+        data.id is string && data.id.size() <= 128 &&
+        data.code is string && data.code.size() <= 50 &&
+        data.subject is string && data.subject.size() <= 100 &&
+        data.grade is string && data.grade.size() <= 50 &&
+        data.topic is string && data.topic.size() <= 200 &&
+        data.level in ['nhan_biet', 'thong_hieu', 'van_dung', 'van_dung_cao'] &&
+        data.content is string && data.content.size() <= 5000;
+    }
+
+    // Validation for User profile entities
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email']) &&
+        data.uid is string && data.uid.size() <= 128 &&
+        data.email is string && data.email.size() <= 200;
+    }
+
+    // 1. Timetables Collection
+    match /timetables/{scheduleId} {
+      allow get, list: if true; // Public read for smart school classroom screens
+      allow create, update: if isValidId(scheduleId) && isValidTimetable(incoming());
+      allow delete: if isValidId(scheduleId);
+    }
+
+    // 2. Questions Collection
+    match /questions/{questionId} {
+      allow get, list: if true; // Read questions for learning & quiz preview
+      allow create, update: if isValidId(questionId) && isValidQuestion(incoming());
+      allow delete: if isValidId(questionId);
+    }
+
+    // 3. User Profiles Collection
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId);
+      allow list: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow create, update: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming());
+      allow delete: if false;
+    }
+
+    // Connection test document
+    match /test/connection {
+      allow read, write: if true;
+    }
+  }
+}
